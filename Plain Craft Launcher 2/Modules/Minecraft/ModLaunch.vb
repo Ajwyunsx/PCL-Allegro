@@ -884,6 +884,9 @@ LoginFinish:
 
         '初始请求
 Retry:
+        If String.IsNullOrEmpty(OAuthClientId) Then
+            Throw New Exception("$尚未配置微软登录的 Client ID，无法进行正版登录。" & vbCrLf & "请在启动器目录下新建 MSClientId.txt，并将申请到的微软 Client ID 粘贴进去（也可设置环境变量 PCL_MS_CLIENT_ID），然后重新登录。")
+        End If
         McLaunchLog("开始微软登录步骤 1/6（原始登录）")
         Dim PrepareJson As JObject = NetRequestByClientRetry("https://login.microsoftonline.com/consumers/oauth2/v2.0/devicecode", HttpMethod.Post,
             Content:=$"client_id={OAuthClientId}&tenant=/consumers&scope=XboxLive.signin%20offline_access",

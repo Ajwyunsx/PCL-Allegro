@@ -35,23 +35,26 @@ Public Class MyHint
     End Property
     Private _ColorType As Themes = Themes.Red
     Private Sub UpdateUI() Handles Me.Loaded
+        RefreshThemeColor()
+    End Sub
+    ''' <summary>
+    ''' 重新应用当前主题对应的提示框配色。
+    ''' </summary>
+    Public Sub RefreshThemeColor()
+        Dim Prefix As String
         Select Case Theme
             Case Themes.Blue
-                Background = New MyColor("#d9ecff")
-                BorderBrush = New MyColor("#1172D4")
-                LabText.Foreground = New MyColor("#0F64B8")
-                BtnClose.Foreground = New MyColor("#0F64B8")
+                Prefix = "Blue"
             Case Themes.Red
-                Background = New MyColor("#ffdddf")
-                BorderBrush = New MyColor("#d82929")
-                LabText.Foreground = New MyColor("#bf0b0b")
-                BtnClose.Foreground = New MyColor("#bf0b0b")
-            Case Themes.Yellow
-                Background = New MyColor("#ffebd7")
-                BorderBrush = New MyColor("#f57a00")
-                LabText.Foreground = New MyColor("#d86c00")
-                BtnClose.Foreground = New MyColor("#d86c00")
+                Prefix = "Red"
+            Case Else 'Themes.Yellow
+                Prefix = "Yellow"
         End Select
+        SetResourceReference(BackgroundProperty, "ColorBrushHint" & Prefix & "Back")
+        SetResourceReference(BorderBrushProperty, "ColorBrushHint" & Prefix & "Line")
+        LabText.SetResourceReference(TextBlock.ForegroundProperty, "ColorBrushHint" & Prefix & "Fore")
+        Dim ForeBrush = TryCast(TryFindResource("ColorBrushHint" & Prefix & "Fore"), SolidColorBrush)
+        If ForeBrush IsNot Nothing Then BtnClose.Foreground = ForeBrush
     End Sub
     <Obsolete("IsWarn 已过时。请换用 Theme 属性。")>
     Public Property IsWarn As Boolean

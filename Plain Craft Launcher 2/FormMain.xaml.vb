@@ -12,7 +12,7 @@ Public Class FormMain
         '统计更新日志条目
         If BuildType = BuildTypes.Release Then
             If LastVersion < 413 Then 'Release 2.99.0.0
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(5, "删除：为遵守相关法律法规，PCL 暂时不再提供 MC 下载功能，非常抱歉 qwq……"))
+                FeatureList.Add(New KeyValuePair(Of Integer, String)(5, "新增：PCL-Allegro 分支，恢复 MC 下载功能，并新增深色主题「幻蓝」"))
             End If
             If LastVersion < 411 Then 'Release 2.14.0.0
                 FeatureList.Add(New KeyValuePair(Of Integer, String)(4, "新增：允许修改、添加、移除、更新已安装版本的各个组件，可从版本设置中进入"))
@@ -104,7 +104,7 @@ Public Class FormMain
             '2：BUG* IMP-
             '1：BUG-
             If LastVersion < 414 Then 'Snapshot 2.99.0.0
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(5, "删除：为遵守相关法律法规，PCL 暂时不再提供 MC 下载功能，非常抱歉 qwq……"))
+                FeatureList.Add(New KeyValuePair(Of Integer, String)(5, "新增：PCL-Allegro 分支，恢复 MC 下载功能，并新增深色主题「幻蓝」"))
             End If
             If LastVersion < 412 Then 'Snapshot 2.14.0.0
                 FeatureList.Add(New KeyValuePair(Of Integer, String)(4, "新增：允许修改、添加、移除、更新已安装版本的各个组件，可从版本设置中进入"))
@@ -281,6 +281,10 @@ Public Class FormMain
 
     '窗口加载
     Private IsWindowLoadFinished As Boolean = False
+    ''' <summary>
+    ''' 是否触发了标题栏 Logo 的彩蛋（把 PCL 换成 PLC）。
+    ''' </summary>
+    Private IsTitleLogoEasterEgg As Boolean = False
     Public Sub New()
         ApplicationStartTick = GetTimeMs()
         '窗体参数初始化
@@ -372,7 +376,8 @@ Public Class FormMain
         Resizer.addResizerUp(ResizerT)
         'PLC 彩蛋
         If RandomInteger(1, 1000) = 233 Then
-            ShapeTitleLogo.Data = New GeometryConverter().ConvertFromString("M26,29 v-25 h6 a7,7 180 0 1 0,14 h-6 M83,6.5 a10,11.5 180 1 0 0,18 M48,2.5 v24.5 h13.5")
+            IsTitleLogoEasterEgg = True
+            LabTitleLogoDefault.Text = "PLC-Allegro"
         End If
         '加载窗口
         ThemeRefreshMain()
@@ -442,6 +447,7 @@ Public Class FormMain
             '清理自动更新文件
             Try
                 FileUtils.Delete(Paths.Base & "PCL\Plain Craft Launcher 2.exe")
+                FileUtils.Delete(Paths.Base & "PCL\PCL-Allegro.exe")
             Catch ex As Exception
                 Logger.Warn(ex, "清理自动更新文件失败")
             End Try
@@ -449,7 +455,7 @@ Public Class FormMain
             Telemetry("启动")
             '开源版本提示
             If VersionBranchMain = "OpenSource" Then
-                MyMsgBox($"该版本中无法使用以下特性：{vbCrLf}- CurseForge API 调用：需要自行申请 API Key，然后添加到 ModSecret.vb 的开头{vbCrLf}- 正版登录：需要自行向微软申请 Client ID，然后添加到 ModSecret.vb 的开头{vbCrLf}- 更新与联网通知：避免滥用隐患{vbCrLf}- 主题切换：这是需要赞助解锁的纪念性质的功能，别让赞助者太伤心啦……{vbCrLf}- 百宝箱：开发早期往里面塞了些开发工具，整理起来太麻烦了……", "开源版本说明")
+                MyMsgBox($"PCL-Allegro 分支说明：{vbCrLf}- 已移除 MC 下载限制，下载与整合包安装均可正常使用{vbCrLf}- 新增深色主题「幻蓝」，可在 设置 → 个性化 → 深色主题 中与原主题随时切换{vbCrLf}{vbCrLf}该版本中仍无法使用以下特性：{vbCrLf}- CurseForge API 调用：需要自行申请 API Key，然后添加到 ModSecret.vb 的开头{vbCrLf}- 正版登录：需要自行向微软申请 Client ID，然后添加到 ModSecret.vb 的开头{vbCrLf}- 更新与联网通知：避免滥用隐患{vbCrLf}- 百宝箱：开发早期往里面塞了些开发工具，整理起来太麻烦了……", "开源版本说明")
             End If
         End Sub, "初始化", ThreadPriority.Lowest)
 
@@ -746,6 +752,7 @@ Public Class FormMain
             Case 0 '无
                 ShapeTitleLogo.Visibility = Visibility.Collapsed
                 LabTitleLogo.Visibility = Visibility.Collapsed
+                LabTitleLogoDefault.Visibility = Visibility.Collapsed
                 ImageTitleLogo.Visibility = Visibility.Collapsed
                 If Not IsNothing(FrmSetupUI) Then 'TODO: 和 FrmSetupUI 解耦
                     FrmSetupUI.CheckLogoLeft.Visibility = Visibility.Visible
@@ -753,8 +760,9 @@ Public Class FormMain
                     FrmSetupUI.PanLogoChange.Visibility = Visibility.Collapsed
                 End If
             Case 1 '默认
-                ShapeTitleLogo.Visibility = Visibility.Visible
+                ShapeTitleLogo.Visibility = Visibility.Collapsed
                 LabTitleLogo.Visibility = Visibility.Collapsed
+                LabTitleLogoDefault.Visibility = Visibility.Visible
                 ImageTitleLogo.Visibility = Visibility.Collapsed
                 If Not IsNothing(FrmSetupUI) Then
                     FrmSetupUI.CheckLogoLeft.Visibility = Visibility.Collapsed
@@ -764,6 +772,7 @@ Public Class FormMain
             Case 2 '文本
                 ShapeTitleLogo.Visibility = Visibility.Collapsed
                 LabTitleLogo.Visibility = Visibility.Visible
+                LabTitleLogoDefault.Visibility = Visibility.Collapsed
                 ImageTitleLogo.Visibility = Visibility.Collapsed
                 If Not IsNothing(FrmSetupUI) Then
                     FrmSetupUI.CheckLogoLeft.Visibility = Visibility.Collapsed
@@ -773,6 +782,7 @@ Public Class FormMain
             Case 3 '图片
                 ShapeTitleLogo.Visibility = Visibility.Collapsed
                 LabTitleLogo.Visibility = Visibility.Collapsed
+                LabTitleLogoDefault.Visibility = Visibility.Collapsed
                 ImageTitleLogo.Visibility = Visibility.Visible
                 If Not IsNothing(FrmSetupUI) Then
                     FrmSetupUI.CheckLogoLeft.Visibility = Visibility.Collapsed
@@ -788,6 +798,7 @@ Public Class FormMain
         End Select
         FrmSetupUI?.CardLogo.TriggerForceResize()
         '标题栏文本
+        LabTitleLogoDefault.Text = If(IsTitleLogoEasterEgg, "PLC-Allegro", ProductName)
         LabTitleLogo.Text = Settings.Get(Of String)("UiLogoText")
         '标题栏文本是否居左
         PanTitleMain.ColumnDefinitions(0).Width = New GridLength(If(Settings.Get(Of Boolean)("UiLogoLeft") AndAlso Settings.Get(Of Integer)("UiLogoType") = 0, 0, 1), GridUnitType.Star)
@@ -1076,10 +1087,6 @@ Public Class FormMain
                     RunInUi(Sub() FrmMain.PageChange(FormMain.PageType.TaskManager))
                     Return
                 Catch ex As Exception
-                    If RestrictMcDownload AndAlso ex.Message = "为遵守相关法律法规，PCL 暂时不再提供 MC 下载功能，非常抱歉 qwq……" Then
-                        Hint(ex.Message, HintType.Red)
-                        Return
-                    End If
                     If ex.IsCanceled Then Return
                     '安装失败，继续往后尝试
                 End Try

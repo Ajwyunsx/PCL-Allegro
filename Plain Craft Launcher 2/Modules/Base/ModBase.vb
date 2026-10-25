@@ -5,6 +5,11 @@ Public Module ModBase
 
 #Region "声明"
 
+    ''' <summary>
+    ''' 产品名，用于标题栏默认 Logo 与各处显示。
+    ''' </summary>
+    Public Const ProductName As String = "PCL-Allegro"
+
     '下列版本信息由更新器自动修改
     Public Const VersionBaseName As String = "2.99.0.0" '显示用版本名
     Public Const CommitHash As String = "" 'Commit Hash，由 GitHub Workflow 自动替换
@@ -43,7 +48,7 @@ Public Module ModBase
     ''' <summary>
     ''' 程序内嵌图片文件夹路径，以 / 结尾。
     ''' </summary>
-    Public PathImage As String = "pack://application:,,,/Plain Craft Launcher 2;component/Images/"
+    Public PathImage As String = "pack://application:,,,/PCL-Allegro;component/Images/"
     ''' <summary>
     ''' 程序的缓存文件夹路径，以 \ 结尾。
     ''' </summary>
